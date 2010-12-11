@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay PUBLIC "-//MOZILLA//DTD XUL V1.0//EN"
+          "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<!--
+  - This overlay is included all over the place to override the various window
+  - opening things in chrome://instantbird/content/menus.js
+  -->
+<overlay id="unibrowOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script defer="true">
+    <![CDATA[ (function Unibrow_menuOverride() {
+      /* hack the window opening code around to not open new windows */
+      Components.utils.import("resource://unibrow/unibrow.jsm");
+      ["accounts", "addons", "errors"]
+        .forEach(function (type) {
+          menus[type] = function Unibrow_openSingleton() {
+            Services.Unibrow.mainWindow.openSingletonWindow(type);
+            Services.Unibrow.mainWindow.focus();
+          }
+        });
+
+      /* show the DOM inspector menu item if it's installed */
+      Components.utils.import("resource://gre/modules/AddonManager.jsm");
+      AddonManager.getAddonByID("inspector@mozilla.org", function(aAddon) {
+        if (aAddon) {
+          document.getElementById("Tasks:Unibrow:DOMI").hidden = false;
+        }
+      });
+    })(); ]]>
+  </script>
+
+  <commandset id="maincommandset">
+    <command id="Tasks:Unibrow:DOMI"
+             hidden="true"
+             oncommand="openDialog('chrome://inspector/content/')"/>
+  </commandset>
+
+  <menupopup id="toolsMenuPopup">
+    <menuitem id="uniDOMI"
+              label="DOM Inspector"
+              observes="Tasks:Unibrow:DOMI"
+              class="menu-iconic-wide"/>
+  </menupopup>
+</overlay>

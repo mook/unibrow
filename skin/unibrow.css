@@ -1,0 +1,45 @@
+#unibrowContainer {
+  -moz-box-orient: horizontal;
+  background-color: rgb(204, 217, 234);
+  background-image: -moz-linear-gradient(center top ,
+                                         rgb(231, 237, 246),
+                                         rgba(231, 237, 246, 0)
+                                         156px),
+                    url("chrome://mozapps/skin/extensions/background-texture.png");
+}
+
+#unibrowList {
+  width: 150px;
+  -moz-appearance: none;
+  background: transparent;
+  margin-right: 0;
+}
+
+#unibrowList richlistitem {
+  width: 0;
+}
+
+#unibrowList richlistitem[selected] {
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgb(195, 206, 223);
+  -moz-border-end-color: transparent;
+  color: rgb(37, 47, 59);
+  font-weight: bold;
+}
+
+richlistitem[selected]:-moz-locale-dir(ltr) {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+richlistitem[selected]:-moz-locale-dir(rtl) {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+#unibrowList richlistitem[for] {
+  -moz-binding: url(chrome://unibrow/content/bindings.xml#singletonTab);
+}
+#unibrowList richlistitem[linkedpanel] {
+  -moz-binding: url(chrome://unibrow/content/bindings.xml#conversationTab);
+}

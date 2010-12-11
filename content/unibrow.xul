@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+  - Overlay for the main instantbird conversation window
+  -
+  - This is where the bulk of the logic is implemented for a single-window
+  - interface for Instantbird.  Since it looks like the <tabconversation>
+  - binding isn't designed to have non-conversation things in it, this does
+  - things in a funny way:
+  -   * _remove_ the existing <tabconversation> (via overlay, not JS)
+  -   * add a new one, except this time in a container
+  -->
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://unibrow/skin/" type="text/css"?>
+<!DOCTYPE overlay PUBLIC "-//MOZILLA//DTD XUL V1.0//EN"
+          "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" [
+    <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+    %brandDTD;
+  ]>
+<window id="unibrowContainer"
+        title="&brandShortName;"
+        windowtype="Unibrow"
+        width="800" height="600" persist="left top width height"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <richlistbox id="unibrowList">
+    <richlistitem id="unibrowBuddiesTab" for="unibrowBuddies"/>
+    <spacer id="unibrowSpacerTab"/>
+  </richlistbox>
+  <deck id="unibrowDeck" flex="1">
+    <browser id="unibrowBuddies"
+             disablehistory="true"
+             type="chrome"
+             src="chrome://instantbird/content/blist.xul"/>
+    <browser id="unibrowConversations"
+             disablehistory="true"
+             type="chrome"
+             src="chrome://instantbird/content/instantbird.xul"/>
+  </deck>
+  <script src="chrome://unibrow/content/unibrow.js"
+          type="application/x-javascript;version=1.8;e4x=1"/>
+</window>

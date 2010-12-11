@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay PUBLIC "-//MOZILLA//DTD XUL V1.0//EN"
+          "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<overlay id="unibrowOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script defer="true">
+    <![CDATA[ (function Unibrow_menuOverride() {
+      Components.utils.import("resource://unibrow/unibrow.jsm");
+      if (typeof("gMainPane") != "undefined") {
+        gMainPane.showAccountsMgr = function Unibrow_showAccountsMgr() {
+          Services.Unibrow.mainWindow.openSingletonWindow("accounts");
+          Services.Unibrow.mainWindow.focus();
+        };
+        gMainPane.showAddonsMgr = function Unibrow_showAddonsMgr() {
+          Services.Unibrow.mainWindow.openSingletonWindow("addons");
+          Services.Unibrow.mainWindow.focus();
+        };
+      }
+    })(); ]]>
+  </script>
+</overlay>
