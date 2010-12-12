@@ -38,6 +38,10 @@
         <spacer id="unibrowSpacerTab"/>
         <tooltip onpopupshowing="return this.parentNode.showTooltip(event);"/>
       </richlistbox>
+      <splitter id="unibrowSplitter"
+                collapse="before">
+        <grippy/>
+      </splitter>
       <deck id="unibrowDeck" flex="1">
         <browser id="unibrowBuddies"
                  disablehistory="true"

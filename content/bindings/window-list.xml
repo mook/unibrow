@@ -12,6 +12,7 @@
     <content>
       <xul:label anonid="label"
                  flex="1"
+                 crop="end"
                  xbl:inherits="value=label"/>
       <xul:toolbarbutton class="tab-close-button"/>
     </content>

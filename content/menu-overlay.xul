@@ -23,23 +23,34 @@
       /* show the DOM inspector menu item if it's installed */
       Components.utils.import("resource://gre/modules/AddonManager.jsm");
       AddonManager.getAddonByID("inspector@mozilla.org", function(aAddon) {
-        if (aAddon) {
-          document.getElementById("Tasks:Unibrow:DOMI").hidden = false;
+        var command = document.getElementById("Command:Unibrow:DOMI");
+        if (aAddon && aAddon.isActive && command) {
+          command.hidden = false;
+          command.removeAttribute("disabled");
         }
       });
     })(); ]]>
   </script>
 
   <commandset id="maincommandset">
-    <command id="Tasks:Unibrow:DOMI"
+    <command id="Command:Unibrow:DOMI"
              hidden="true"
+             disabled="true"
              oncommand="openDialog('chrome://inspector/content/')"/>
   </commandset>
 
+  <keyset id="mainkeyset">
+    <key id="Key:Unibrow:DOMI"
+         key="I"
+         command="Command:Unibrow:DOMI"
+         modifiers="accel shift"/>
+  </keyset>
+
   <menupopup id="toolsMenuPopup">
-    <menuitem id="uniDOMI"
+    <menuitem id="Menu:Unibrow:DOMI"
               label="DOM Inspector"
-              observes="Tasks:Unibrow:DOMI"
+              key="Key:Unibrow:DOMI"
+              observes="Command:Unibrow:DOMI"
               class="menu-iconic-wide"/>
   </menupopup>
 </overlay>

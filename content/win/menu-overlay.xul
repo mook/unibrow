@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay PUBLIC "-//MOZILLA//DTD XUL V1.0//EN"
+          "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<!--
+  - This hides the menu on uninteresting windows
+  -->
+<overlay id="unibrowOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <menubar id="blistMenubar" hidden="true"/>
+</overlay>

@@ -1,12 +1,14 @@
 content unibrow content/
+content unibrow-platform content/ platform
 skin unibrow classic/1.0 skin/
 locale unibrow en-US locale/en-US/
 
 resource unibrow jsmodules/
 
 # override chrome://instantbird/content/menus.js to open windows differently
-overlay chrome://instantbird/content/blist.xul chrome://unibrow/content/menu-overlay.xul
 overlay chrome://instantbird/content/menus.xul chrome://unibrow/content/menu-overlay.xul
+
+overlay chrome://instantbird/content/blist.xul chrome://unibrow-platform/content/menu-overlay.xul
 
 overlay chrome://instantbird/content/preferences/main.xul chrome://unibrow/content/prefs-overlay.xul
 

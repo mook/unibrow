@@ -26,7 +26,7 @@
 }
 
 #unibrowList richlistitem[selected] {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.75);
   border-color: rgb(195, 206, 223);
   -moz-border-end-color: transparent;
   color: rgb(37, 47, 59);
@@ -56,6 +56,33 @@ richlistitem[selected]:-moz-locale-dir(rtl) {
   -moz-binding: url(chrome://unibrow/content/bindings/window-list.xml#conversationTab);
 }
 
+#unibrowSplitter {
+  background-color: transparent;
+  background-image: -moz-linear-gradient(top,
+                                         transparent,
+                                         -moz-dialog,
+                                         transparent);
+}
+#unibrowSplitter grippy:-moz-locale-dir(ltr):hover,
+#unibrowSplitter[state="collapsed"] grippy:-moz-locale-dir(rtl):hover {
+  background-color: transparent;
+  background-image: url("chrome://global/skin/splitter/grip-left.gif"),
+                    -moz-linear-gradient(top,
+                                         transparent,
+                                         -moz-dialog 20%,
+                                         -moz-dialog 80%,
+                                         transparent);
+}
+#unibrowSplitter grippy:-moz-locale-dir(rtl):hover,
+#unibrowSplitter[state="collapsed"] grippy:-moz-locale-dir(ltr):hover {
+  background-color: transparent;
+  background-image: url("chrome://global/skin/splitter/grip-right.gif"),
+                    -moz-linear-gradient(top,
+                                         transparent,
+                                         -moz-dialog 20%,
+                                         -moz-dialog 80%,
+                                         transparent);
+}
 
 #conversations {
   -moz-binding: url("chrome://unibrow/content/bindings/conversations.xml#conversations");
