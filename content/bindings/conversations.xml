@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE bindings PUBLIC "-//MOZILLA//DTD XBL V1.0//EN" "http://www.mozilla.org/xbl">
+
+<bindings
+    xmlns="http://www.mozilla.org/xbl"
+    xmlns:xbl="http://www.mozilla.org/xbl"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <binding id="conversations"
+           extends="chrome://instantbird/content/tabbrowser.xml#tabbrowser">
+    <implementation>
+      <constructor><![CDATA[
+        // disable ctrl+tab handling
+        this.mTabBox.handleCtrlTab = false;
+        this.mTabBox.handleCtrlPageUpDown = false;
+      ]]></constructor>
+      <field name="linkedList">
+        document.getElementById(this.getAttribute("linkedList"));
+      </field>
+      <method name="addConversation">
+        <parameter name="aConv"/>
+        <body><![CDATA[
+          // we _always_ want to use the same window for everything.
+          var conv = this._addConversation(aConv);
+          this.linkedList.addConversation(conv);
+          return conv;
+        ]]></body>
+      </method>
+      <method name="getListItemForTab">
+        <parameter name="aTab" type="xul:tab"/>
+        <body><![CDATA[
+          for (let i = 0; i < this.linkedList.childNodes.length; ++i) {
+            let item = this.linkedList.childNodes.item(i);
+            if (item.panelId == aTab.linkedPanel) {
+              return item;
+            }
+          }
+          return null;
+        ]]></body>
+      </method>
+    </implementation>
+
+    <handlers>
+    </handlers>
+  </binding>
+
+  <binding id="tabstrip"
+           extends="chrome://instantbird/content/tabbrowser.xml#tabbrowser-tabs">
+    <implementation>
+      <field name="_tabbrowser">
+        this.tabbox.parentNode;
+      </field>
+    </implementation>
+    <handlers>
+      <handler event="TabSelect" phase="bubbling"><![CDATA[
+        var tab = event.originalTarget;
+        var item = this._tabbrowser.getListItemForTab(tab);
+        if (item) {
+          this._tabbrowser.linkedList.selectedItem = item;
+        }
+      ]]></handler>
+    </handlers>
+  </binding>
+
+</bindings>

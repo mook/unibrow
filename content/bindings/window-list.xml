@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE bindings PUBLIC "-//MOZILLA//DTD XBL V1.0//EN" "http://www.mozilla.org/xbl">
+
+<bindings
+    xmlns="http://www.mozilla.org/xbl"
+    xmlns:xbl="http://www.mozilla.org/xbl"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <binding id="baseTab"
+           extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
+    <content>
+      <xul:label anonid="label"
+                 flex="1"
+                 xbl:inherits="value=label"/>
+      <xul:toolbarbutton class="tab-close-button"/>
+    </content>
+    <implementation>
+      <property name="label">
+        <getter>
+          return this.getAttribute("label");
+        </getter>
+        <setter>
+          this.setAttribute("label", val);
+          return String(val);
+        </setter>
+      </property>
+    </implementation>
+  </binding>
+
+  <binding id="singletonTab"
+           extends="#baseTab">
+    <implementation>
+      <method name="remove">
+        <body><![CDATA[
+          var panel = document.getElementById(this.getAttribute("for"));
+          panel.parentNode.removeChild(panel);
+          var newItem = this.parentNode.getNextItem(this, 1) ||
+                        this.parentNode.getPreviousItem(this, 1);
+          this.parentNode.selectedItem = newItem;
+          this.parentNode.removeChild(this);
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+
+  <binding id="conversationTab"
+           extends="#baseTab">
+    <implementation>
+      <property name="panelId">
+        <getter>
+          return this.getAttribute("linkedpanel");
+        </getter>
+      </property>
+      <property name="panel">
+        <getter>
+          return document.getElementById(this.panelId);
+        </getter>
+      </property>
+      <property name="tab">
+        <getter>
+          return this.panel.parentNode.getRelatedElement(this.panel);
+        </getter>
+      </property>
+      <property name="tabbrowser">
+        <getter>
+          return document.getBindingParent(this.panel);
+        </getter>
+      </property>
+      <method name="remove">
+        <body><![CDATA[
+          this.tabbrowser.removeTab(this.tab);
+        ]]></body>
+      </method>
+      <method name="showTooltip">
+        <parameter name="event"/>
+        <body><![CDATA[
+          var strip = this.tabbrowser.mStrip;
+          var tooltip = strip.querySelector("tooltip");
+          var conv = this.tab.linkedConversation.conv;
+          if (conv) {
+            tooltip.updateTooltipFromConversation(conv, this.tab);
+          }
+          tooltip.openPopupAtScreen(event.screenX, event.screenY, false);
+          function onMouseMove() {
+            removeEventListener("mousemove", onMouseMove, false);
+            tooltip.hidePopup();
+          }
+          addEventListener("mousemove", onMouseMove, false);
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+  
+  <binding id="closebutton"
+           extends="chrome://instantbird/content/tabbrowser.xml#tabbrowser-close-tab-button">
+    <handlers>
+      <handler event="click" phase="capturing"><![CDATA[
+        { /** copied from tabbrowser#tabbrowser-close-tab-button */
+          if (event.detail > 1 && !this._ignoredClick) {
+            this._ignoredClick = true;
+            return;
+          }
+          // Reset the "ignored click" flag
+          this._ignoredClick = false;
+        }
+        document.getBindingParent(this).remove();
+        event.stopPropagation();
+        event.preventDefault();
+      ]]></handler>
+    </handlers>
+  </binding>
+
+  <binding id="list"
+           extends="chrome://global/content/bindings/richlistbox.xml#richlistbox">
+    <implementation>
+      <method name="addConversation">
+        <parameter name="aConv" type="purpleIConversation"/>
+        <body><![CDATA[
+          var item = this.ownerDocument.createElement("richlistitem");
+          this.appendChild(item);
+          item.setAttribute("linkedpanel", aConv.tab.linkedPanel);
+          item.setAttribute("label", aConv.tab.label);
+        ]]></body>
+      </method>
+      <method name="addSingletonWindow">
+        <parameter name="aWindowType" type="string"/>
+        <parameter name="aURL" type="string"/>
+        <body><![CDATA[
+          var type = aWindowType.replace(/./, String.toUpperCase);
+          var item = this.ownerDocument.createElement("richlistitem");
+          item.setAttribute("id", "unibrow" + type + "Tab");
+          item.setAttribute("for", "unibrow" + type);
+          try {
+            let key = "unibrow.tabs." + aWindowType + ".label";
+            item.setAttribute("label", Unibrow.strings.GetStringFromName(key));
+          }
+          catch (e) {
+            item.setAttribute("label", type);
+          }
+          this.insertBefore(item, document.getElementById("unibrowSpacerTab"));
+          this.selectedItem = item;
+        ]]></body>
+      </method>
+      <method name="showTooltip">
+        <parameter name="event"/>
+        <body><![CDATA[
+          var elem = document.elementFromPoint(event.clientX, event.clientY);
+          if (("showTooltip" in elem) && (elem != this)) {
+            elem.showTooltip(event);
+          }
+          event.preventDefault();
+          return false;
+        ]]></body>
+      </method>
+    </implementation>
+  </binding>
+
+</bindings>

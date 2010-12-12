@@ -8,7 +8,13 @@
                     url("chrome://mozapps/skin/extensions/background-texture.png");
 }
 
+/*#conversations .tabbrowser-strip {
+  visibility: collapse;
+}
+*/
+
 #unibrowList {
+  -moz-binding: url(chrome://unibrow/content/bindings/window-list.xml#list);
   width: 150px;
   -moz-appearance: none;
   background: transparent;
@@ -16,15 +22,22 @@
 }
 
 #unibrowList richlistitem {
+  border: 1px solid transparent;
   width: 0;
 }
 
 #unibrowList richlistitem[selected] {
   background-color: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgb(195, 206, 223);
+  border-color: rgb(195, 206, 223);
   -moz-border-end-color: transparent;
   color: rgb(37, 47, 59);
   font-weight: bold;
+}
+
+#unibrowList richlistitem:not([closebutton="false"]) .tab-close-button {
+  display: -moz-box;
+  -moz-margin-end: 3px;
+  -moz-binding: url(chrome://unibrow/content/bindings/window-list.xml#closebutton);
 }
 
 richlistitem[selected]:-moz-locale-dir(ltr) {
@@ -38,8 +51,17 @@ richlistitem[selected]:-moz-locale-dir(rtl) {
 }
 
 #unibrowList richlistitem[for] {
-  -moz-binding: url(chrome://unibrow/content/bindings.xml#singletonTab);
+  -moz-binding: url(chrome://unibrow/content/bindings/window-list.xml#singletonTab);
 }
 #unibrowList richlistitem[linkedpanel] {
-  -moz-binding: url(chrome://unibrow/content/bindings.xml#conversationTab);
+  -moz-binding: url(chrome://unibrow/content/bindings/window-list.xml#conversationTab);
+}
+
+
+#conversations {
+  -moz-binding: url("chrome://unibrow/content/bindings/conversations.xml#conversations");
+}
+
+#conversations .tabbrowser-tabs {
+  -moz-binding: url("chrome://unibrow/content/bindings/conversations.xml#tabstrip");
 }

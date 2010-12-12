@@ -11,30 +11,91 @@
   -->
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://unibrow/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://instantbird/content/instantbird.css" type="text/css"?>
+<?xml-stylesheet href="chrome://instantbird/content/tabbrowser.css" type="text/css"?>
+<?xml-stylesheet href="chrome://instantbird/skin/tabbrowser.css" type="text/css"?>
 <!DOCTYPE overlay PUBLIC "-//MOZILLA//DTD XUL V1.0//EN"
           "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" [
     <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
     %brandDTD;
+    <!ENTITY % brandDTD SYSTEM "chrome://instantbird/locale/instantbird.dtd">
+    %instantbirdDTD;
   ]>
 <window id="unibrowContainer"
         title="&brandShortName;"
         windowtype="Unibrow"
         width="800" height="600" persist="left top width height"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <richlistbox id="unibrowList">
-    <richlistitem id="unibrowBuddiesTab" for="unibrowBuddies"/>
+  <richlistbox id="unibrowList" tooltip="_child">
+    <richlistitem id="unibrowBuddiesTab"
+                  for="unibrowBuddies"
+                  closebutton="false"/>
     <spacer id="unibrowSpacerTab"/>
+    <tooltip onpopupshowing="return this.parentNode.showTooltip(event);"/>
   </richlistbox>
   <deck id="unibrowDeck" flex="1">
     <browser id="unibrowBuddies"
              disablehistory="true"
              type="chrome"
              src="chrome://instantbird/content/blist.xul"/>
-    <browser id="unibrowConversations"
-             disablehistory="true"
-             type="chrome"
-             src="chrome://instantbird/content/instantbird.xul"/>
+    
+    <tabconversation id="conversations"
+                     flex="1"
+                     linkedList="unibrowList"
+                     contenttooltip="aHTMLTooltip"
+                     contentcontextmenu="contentAreaContextMenu"/>
   </deck>
+  <popupset id="mainPopupSet">
+    <tooltip id="aHTMLTooltip"
+             onpopupshowing="return FillInHTMLTooltip(document.tooltipNode);"/>
+
+    <menupopup id="contentAreaContextMenu"
+               onpopupshowing="if (event.target != this)
+                                 return true;
+                               gContextMenu = new nsContextMenu(this, window.getBrowser());
+                               return gContextMenu.shouldDisplay;"
+               onpopuphiding="if (event.target == this) { gContextMenu = null; }">
+      <!--
+      <menuitem id="context-openlink"
+                label="&openLinkCmd.label;"
+                accesskey="&openLinkCmd.accesskey;"
+                oncommand="gContextMenu.openLink();"/>
+      <menuitem id="context-copyemail"
+                label="&copyEmailCmd.label;"
+                accesskey="&copyEmailCmd.accesskey;"
+                oncommand="gContextMenu.copyEmail();"/>
+      <menuitem id="context-copylink"
+                label="&copyLinkCmd.label;"
+                accesskey="&copyLinkCmd.accesskey;"
+                oncommand="goDoCommand('cmd_copyLink');"/>
+      <menuseparator id="context-sep-copylink"/>
+
+      <menuitem id="context-copy"
+                label="&copyCmd.label;"
+                accesskey="&copyCmd.accesskey;"
+                command="cmd_copy"/>
+      <menuitem id="context-selectall"
+                label="&selectAllCmd.label;"
+                accesskey="&selectAllCmd.accesskey;"
+                command="cmd_selectAll"/>
+      <menuseparator id="context-sep-selectall"/>
+      <menuitem id="context-searchselect"
+                oncommand="gContextMenu.searchSelection();"/>
+      <menu id="context-searchselect-with">
+        <menupopup id="context-popup-searchselect-with"
+                   onpopupshowing="gContextMenu.buildSearchEngineList();"
+                   oncommand="gContextMenu.searchSelectionWith(event)">
+          <menuseparator id="context-sep-enginemanager"/>
+          <menuitem id="context-enginemanager"
+                    label="&engineManagerCmd.label;"
+                    oncommand="gContextMenu.openEngineManager();"/>
+        </menupopup>
+      </menu>
+  -->
+    </menupopup>
+  </popupset>
+  <script src="chrome://unibrow/content/unibrow-compat.js"
+          type="application/x-javascript;version=1.8;e4x=1"/>
   <script src="chrome://unibrow/content/unibrow.js"
           type="application/x-javascript;version=1.8;e4x=1"/>
 </window>

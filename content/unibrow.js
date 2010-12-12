@@ -5,6 +5,7 @@
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource:///modules/imWindows.jsm");
 
 var Unibrow = {
   __proto__: window,
@@ -15,17 +16,6 @@ var Unibrow = {
   list: null,          /** <richlistbox id="unibrowList"> */
   deck: null,          /** <deck id="unibrowDeck"> */
   strings: null,       /** nsIStringBundle */
-
-  /* overrides */
-  browser_addConversation: function Unibrow_browser_addConversation(aConv) {
-    // we _always_ want to use the same window for everything.
-    var conv = Unibrow.browser._addConversation(aConv);
-    var item = document.createElement("richlistitem");
-    Unibrow.list.appendChild(item);
-    item.setAttribute("linkedpanel", conv.tab.linkedPanel);
-    item.setAttribute("label", conv.tab.label);
-    return conv;
-  },
 
   /* */
   openSingletonWindow: function Unibrow_openSingletonWindow(aWindowType) {
@@ -46,18 +36,7 @@ var Unibrow = {
       frame.setAttribute("disablehistory", true);
       frame.setAttribute("id", "unibrow" + type);
       Unibrow.deck.appendChild(frame);
-      tab = document.createElement("richlistitem");
-      tab.setAttribute("id", "unibrow" + type + "Tab");
-      tab.setAttribute("for", "unibrow" + type);
-      try {
-        let key = "unibrow.tabs." + aWindowType + ".label";
-        tab.setAttribute("label", Unibrow.strings.GetStringFromName(key));
-      }
-      catch (e) {
-        tab.setAttribute("label", type);
-      }
-      Unibrow.list.insertBefore(tab, document.getElementById("unibrowSpacerTab"));
-      Unibrow.list.selectedItem = tab;
+      Unibrow.list.addSingletonWindow(aWindowType, URLS[aWindowType]);
       frame.loadURI(URLS[aWindowType], null, null);
     }
   },
@@ -69,9 +48,10 @@ var Unibrow = {
       return;
     }
 
-    Unibrow.browser.addConversation = Unibrow.browser_addConversation;
-    Unibrow.browser.tabContainer.addEventListener("TabSelect", Unibrow.onTabSelect, false);
-    Unibrow.browser.tabContainer.addEventListener("TabClose", Unibrow.onTabClose, false);
+    Conversations.registerWindow(window);
+
+    Unibrow.convTabs.addEventListener("TabSelect", Unibrow.onTabSelect, false);
+    Unibrow.convTabs.addEventListener("TabClose", Unibrow.onTabClose, false);
     Unibrow.list.addEventListener("select", Unibrow.onListSelect, false);
     document.getElementById("unibrowBuddiesTab").label =
       Unibrow.strings.GetStringFromName("unibrow.tabs.buddies.label");
@@ -85,12 +65,15 @@ var Unibrow = {
       return;
     }
 
+    Conversations.unregisterWindow(window);
+
     Cc['@mozilla.org/toolkit/app-startup;1']
       .getService(Ci.nsIAppStartup)
       .quit(Ci.nsIAppStartup.eAttemptQuit);
   },
 
   onTabSelect: function Unibrow_onTabSelect(aEvent) {
+    return;
     var tab = aEvent.originalTarget;
     for (let i = 0; i < Unibrow.list.childNodes.length; ++i) {
       let item = Unibrow.list.childNodes.item(i);
@@ -121,7 +104,7 @@ var Unibrow = {
     else if ("tab" in item) {
       // this is a proxy item
       Unibrow.deck.selectedPanel = Unibrow.conversations;
-      Unibrow.browserTabs.selectedItem = item.tab;
+      Unibrow.convTabs.selectedItem = item.tab;
       return;
     }
   }
@@ -129,13 +112,13 @@ var Unibrow = {
 
 XPCOMUtils.defineLazyGetter(Unibrow,
                             "conversations",
-                            function()document.getElementById("unibrowConversations"));
+                            function()document.getElementById("conversations"));
 XPCOMUtils.defineLazyGetter(Unibrow,
                             "browser",
-                            function()Unibrow.conversations.contentWindow.getBrowser());
+                            function()document.getElementById("conversations"));
 XPCOMUtils.defineLazyGetter(Unibrow,
-                            "browserTabs",
-                            function()Unibrow.browser.tabContainer);
+                            "convTabs",
+                            function()Unibrow.conversations.tabContainer);
 XPCOMUtils.defineLazyGetter(Unibrow,
                             "list",
                             function()document.getElementById("unibrowList"));
