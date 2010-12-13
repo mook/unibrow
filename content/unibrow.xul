@@ -11,30 +11,32 @@
   -->
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://unibrow/skin/" type="text/css"?>
+<?xul-overlay href="chrome://instantbird/content/menus.xul"?>
 <!DOCTYPE overlay PUBLIC "-//MOZILLA//DTD XUL V1.0//EN"
           "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" [
     <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
     %brandDTD;
   ]>
-<window id="unibrowContainer"
+<window id="unibrowWindow"
         title="&brandShortName;"
         windowtype="Unibrow"
         width="800" height="600" persist="left top width height"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <richlistbox id="unibrowList">
-    <richlistitem id="unibrowBuddiesTab" for="unibrowBuddies"/>
-    <spacer id="unibrowSpacerTab"/>
-  </richlistbox>
-  <deck id="unibrowDeck" flex="1">
-    <browser id="unibrowBuddies"
-             disablehistory="true"
+  <hbox id="unibrowContainer" flex="1">
+    <browser id="buddyFrame"
              type="chrome"
+             disablehistory="true"
              src="chrome://instantbird/content/blist.xul"/>
-    <browser id="unibrowConversations"
+    <splitter id="mainSplitter"
+              collapse="before">
+      <grippy/>
+    </splitter>
+    <browser id="conversationFrame"
              disablehistory="true"
+             src="chrome://instantbird/content/instantbird.xul"
              type="chrome"
-             src="chrome://instantbird/content/instantbird.xul"/>
-  </deck>
+             flex="1"/>
+  </hbox>
   <script src="chrome://unibrow/content/unibrow.js"
           type="application/x-javascript;version=1.8;e4x=1"/>
 </window>

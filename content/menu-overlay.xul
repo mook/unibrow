@@ -10,21 +10,13 @@
 
   <script defer="true">
     <![CDATA[ (function Unibrow_menuOverride() {
-      /* hack the window opening code around to not open new windows */
-      Components.utils.import("resource://unibrow/unibrow.jsm");
-      ["accounts", "addons", "errors"]
-        .forEach(function (type) {
-          menus[type] = function Unibrow_openSingleton() {
-            Services.Unibrow.mainWindow.openSingletonWindow(type);
-            Services.Unibrow.mainWindow.focus();
-          }
-        });
-
       /* show the DOM inspector menu item if it's installed */
       Components.utils.import("resource://gre/modules/AddonManager.jsm");
       AddonManager.getAddonByID("inspector@mozilla.org", function(aAddon) {
-        if (aAddon) {
-          document.getElementById("Tasks:Unibrow:DOMI").hidden = false;
+        var command = document.getElementById("Tasks:Unibrow:DOMI");
+        if (aAddon && aAddon.isActive && command) {
+          command.hidden = false;
+          command.removeAttribute("disabled");
         }
       });
     })(); ]]>
@@ -33,8 +25,17 @@
   <commandset id="maincommandset">
     <command id="Tasks:Unibrow:DOMI"
              hidden="true"
+             disabled="true"
              oncommand="openDialog('chrome://inspector/content/')"/>
   </commandset>
+  
+  <keyset id="mainkeyset">
+    <key id="Key:Unibrow:DOMI"
+         command="Tasks:Unibrow:DOMI"
+         observes="Tasks:Unibrow:DOMI"
+         key="I"
+         modifiers="accel shift"/>
+  </keyset>
 
   <menupopup id="toolsMenuPopup">
     <menuitem id="uniDOMI"
