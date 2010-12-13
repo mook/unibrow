@@ -33,9 +33,14 @@ var Unibrow = {
     // force aCloseWindowFastpath to be false and see what we get
     var result = this.__proto__._beginRemoveTab.call(
                    this, aTab, aTabWillBeMoved, false);
-    if (result && result[1]) {
-      // will close window
-      return Unibrow.conversations.reload();
+    if (result) {
+      // closing
+      Services.Unibrow.Tag.removeConversation(result[0].linkedConversation.conv);
+      if (result[1]) {
+        // will close window
+        Unibrow.conversations.reload();
+        return [result[0], false];
+      }
     }
     return result;
   },

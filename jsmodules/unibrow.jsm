@@ -9,7 +9,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource:///modules/imServices.jsm");
 
 function UnibrowContact(aConv) {
-  Cu.reportError(aConv);
   this._conv = aConv;
   this._observers = [];
   this.id = -(Date.now() >>> 0);
@@ -82,7 +81,6 @@ UnibrowContact.prototype = {
   /** imIBuddy */
   // id is reused from imIContact
   get protocol() {
-    Cu.reportError(this._conv.account.protocol);
     return this._conv.account.protocol;
   },
   get userName() this._conv.name,
@@ -135,6 +133,9 @@ var UnibrowTag = {
     this._contacts = this._contacts.filter(function (c) {
       return (c.conversation == aConv) && removed.push(c);
     });
+    removed.forEach(function(contact) {
+      contact.notifyObservers(contact, "contact-removed", contact.id);
+    }, this);
     return removed;
   },
 
