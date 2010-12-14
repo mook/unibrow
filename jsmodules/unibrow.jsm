@@ -10,9 +10,9 @@ Cu.import("resource:///modules/imServices.jsm");
 
 function UnibrowContact(aConv) {
   this._conv = aConv;
+  this._conv.addObserver(this);
   this._observers = [];
   this.id = -(Date.now() >>> 0);
-  this.alias = aConv.title;
 }
 
 UnibrowContact.prototype = {
@@ -22,10 +22,15 @@ UnibrowContact.prototype = {
 
   /** public interface */
   get conversation() this._conv,
+  destroy: function UnibrowContact_destroy() {
+    this.notifyObservers(this, "contact-removed", this.id);
+    this._conv.removeObserver(this);
+    delete this._conv;
+  },
 
   /** imIContact */
   id: -1,
-  alias: "",
+  get alias() this._conv.title,
   getTags: function UnibrowContact_getTags(aCount) {
     if (aCount) {
       aCount.value = 1;
@@ -67,9 +72,19 @@ UnibrowContact.prototype = {
   /** imIStatusInfo */
   get displayName() this._conv.name,
   get buddyIconFilename() null,
-  get statusType() Ci.imIStatusInfo.STATUS_AVAILABLE,
-  get online() true,
-  get available() true,
+  get statusType() this.available ?
+                     Ci.imIStatusInfo.STATUS_AVAILABLE :
+                     Ci.imIStatusInfo.STATUS_OFFLINE,
+  get online() this.available,
+  get available() {
+    if (this._conv instanceof Ci.purpleIConvIM) {
+      return this._conv.buddy ? this._conv.buddy.available : false;
+    }
+    else if (this._conv instanceof Ci.purpleIConvChat) {
+      return !this._conv.left;
+    }
+    return true;
+  },
   get idle() false,
   get mobile() false,
   get statusText() "(not implementeed)",
@@ -103,13 +118,20 @@ UnibrowContact.prototype = {
   // removeObserver is reused from imIContact
   // notifyObservers is reused from imIContact
   observe: function(aSubject, aTopic, aData) {
-    Cu.reportError("fake contact observed " + aTopic);
+    switch(aTopic) {
+      case "update-conv-chatleft":
+        this.notifyObservers(this, "contact-availability-changed", null);
+        break;
+      default:
+        Cu.reportError("fake contact observed " + aTopic);
+    }
   },
 
   /** nsISupports */
   QueryInterface: XPCOMUtils.generateQI([Ci.imIContact,
                                          Ci.imIStatusInfo,
-                                         Ci.imIBuddy])
+                                         Ci.imIBuddy,
+                                         Ci.nsIObserver])
 };
 
 
@@ -134,7 +156,7 @@ var UnibrowTag = {
       return !((c.conversation == aConv) && removed.push(c));
     });
     removed.forEach(function(contact) {
-      contact.notifyObservers(contact, "contact-removed", contact.id);
+      contact.destroy();
     });
     return removed;
   },
