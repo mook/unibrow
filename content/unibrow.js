@@ -12,8 +12,6 @@ var Unibrow = {
   /* members */
   conversations: null, /** <browser src=instantbird.xul> */
   browser: null,       /** <conversations> */
-  browserTabs: null,   /** <xul:tabs> for the <conversations> */
-  list: null,          /** <richlistbox id="unibrowList"> */
   deck: null,          /** <deck id="unibrowDeck"> */
   strings: null,       /** nsIStringBundle */
   
@@ -24,7 +22,7 @@ var Unibrow = {
     // we _always_ want to use the same window for everything.
     var conv = Unibrow.browser._addConversation(aConv);
     var contact = Services.Unibrow.Tag.addConversation(aConv);
-    Unibrow.buddyWin.buddyList.observe(contact, "fake-buddy", null);
+    Unibrow.buddyFrame.contentWindow.buddyList.observe(contact, "fake-buddy", null);
     Unibrow.convDeck.selectedPanel = Unibrow.conversations;
     return conv;
   },
@@ -111,8 +109,6 @@ var Unibrow = {
   
   /** getters that can't be lazy because things might change under them */
   get browser() Unibrow.conversations.contentWindow.getBrowser(),
-  get browserTabs() Unibrow.browser.tabContainer,
-  get buddyWin() Unibrow.buddyFrame.contentWindow
 };
 
 XPCOMUtils.defineLazyGetter(Unibrow,
