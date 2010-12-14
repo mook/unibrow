@@ -131,11 +131,11 @@ var UnibrowTag = {
   removeConversation: function UnibrowTag_removeConversation(aConv) {
     var removed = [];
     this._contacts = this._contacts.filter(function (c) {
-      return (c.conversation == aConv) && removed.push(c);
+      return !((c.conversation == aConv) && removed.push(c));
     });
     removed.forEach(function(contact) {
       contact.notifyObservers(contact, "contact-removed", contact.id);
-    }, this);
+    });
     return removed;
   },
 

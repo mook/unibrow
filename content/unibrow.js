@@ -16,6 +16,8 @@ var Unibrow = {
   list: null,          /** <richlistbox id="unibrowList"> */
   deck: null,          /** <deck id="unibrowDeck"> */
   strings: null,       /** nsIStringBundle */
+  
+  _convWPL: null, /** nsIWebProgressListener for Unibrow.conversations */
 
   /* overrides */
   browser_addConversation: function Unibrow_browser_addConversation(aConv) {
@@ -23,6 +25,7 @@ var Unibrow = {
     var conv = Unibrow.browser._addConversation(aConv);
     var contact = Services.Unibrow.Tag.addConversation(aConv);
     Unibrow.buddyWin.buddyList.observe(contact, "fake-buddy", null);
+    Unibrow.convDeck.selectedPanel = Unibrow.conversations;
     return conv;
   },
 
@@ -39,6 +42,7 @@ var Unibrow = {
       if (result[1]) {
         // will close window
         Unibrow.conversations.reload();
+        Unibrow.convDeck.selectedPanel = Unibrow.convFacade;
         return [result[0], false];
       }
     }
@@ -56,6 +60,29 @@ var Unibrow = {
     Unibrow.browser.addConversation = Unibrow.browser_addConversation;
     Unibrow.browser._beginRemoveTab = Unibrow.browser_beginRemoveTab;
     Unibrow.browser.tabContainer.addEventListener("TabSelect", Unibrow.onTabSelect, false);
+    
+    // hook up a listener for when Unibrow.conversations reloads
+    Unibrow._convWPL = {
+      onStateChange: function Unibrow_WPL_onStateChange(aWebProgress,
+                                                        aRequest,
+                                                        aStateFlags,
+                                                        aStatus)
+      {
+        const nsIWPL = Ci.nsIWebProgressListener;
+        const FLAGS_WANTED = nsIWPL.STATE_STOP | nsIWPL.STATE_IS_WINDOW;
+        if ((aStateFlags & FLAGS_WANTED) == FLAGS_WANTED) {
+          Unibrow.browser.addConversation = Unibrow.browser_addConversation;
+          Unibrow.browser._beginRemoveTab = Unibrow.browser_beginRemoveTab;
+          Unibrow.browser.tabContainer.addEventListener("TabSelect", Unibrow.onTabSelect, false);
+        }
+      },
+      QueryInterface: XPCOMUtils.generateQI([Ci.nsIWebProgressListener,
+                                             Ci.nsISupportsWeakReference])
+    };
+    Unibrow.conversations
+           .webProgress
+           .addProgressListener(Unibrow._convWPL,
+                                Ci.nsIWebProgress.NOTIFY_STATE_WINDOW);
   },
 
   onUnload: function Unibrow_onUnload(aEvent) {
@@ -67,6 +94,7 @@ var Unibrow = {
     Cc['@mozilla.org/toolkit/app-startup;1']
       .getService(Ci.nsIAppStartup)
       .quit(Ci.nsIAppStartup.eAttemptQuit);
+    Unibrow.conversations.webProgress.removeProgressListener(Unibrow._convWPL);
   },
 
   onTabSelect: function Unibrow_onTabSelect(aEvent) {
@@ -80,26 +108,25 @@ var Unibrow = {
       }
     }
   },
-  observe: function Unibrow_observe(aSubject, aTopic, aData) {
-    
-  }
+  
+  /** getters that can't be lazy because things might change under them */
+  get browser() Unibrow.conversations.contentWindow.getBrowser(),
+  get browserTabs() Unibrow.browser.tabContainer,
+  get buddyWin() Unibrow.buddyFrame.contentWindow
 };
 
+XPCOMUtils.defineLazyGetter(Unibrow,
+                            "convDeck",
+                            function()document.getElementById("conversationDeck"));
+XPCOMUtils.defineLazyGetter(Unibrow,
+                            "convFacade",
+                            function()document.getElementById("conversationFacade"));
 XPCOMUtils.defineLazyGetter(Unibrow,
                             "conversations",
                             function()document.getElementById("conversationFrame"));
 XPCOMUtils.defineLazyGetter(Unibrow,
-                            "browser",
-                            function()Unibrow.conversations.contentWindow.getBrowser());
-XPCOMUtils.defineLazyGetter(Unibrow,
-                            "browserTabs",
-                            function()Unibrow.browser.tabContainer);
-XPCOMUtils.defineLazyGetter(Unibrow,
                             "buddyFrame",
                             function()document.getElementById("buddyFrame"));
-XPCOMUtils.defineLazyGetter(Unibrow,
-                            "buddyWin",
-                            function()Unibrow.buddyFrame.contentWindow);
 XPCOMUtils.defineLazyGetter(Unibrow,
                             "strings",
                             function()Services.strings.createBundle("chrome://unibrow/locale/unibrow.properties"));

@@ -1,3 +1,9 @@
 #buddyFrame {
   width: 200px;
 }
+
+#conversationFacade description {
+  width: 0;
+  -moz-box-flex: 1;
+  text-align: center;
+}

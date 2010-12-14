@@ -16,6 +16,8 @@
           "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" [
     <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
     %brandDTD;
+    <!ENTITY % unibrowDTD SYSTEM "chrome://unibrow/locale/unibrow.dtd">
+    %unibrowDTD;
   ]>
 <window id="unibrowWindow"
         title="&brandShortName;"
@@ -31,11 +33,16 @@
               collapse="before">
       <grippy/>
     </splitter>
-    <browser id="conversationFrame"
-             disablehistory="true"
-             src="chrome://instantbird/content/instantbird.xul"
-             type="chrome"
-             flex="1"/>
+    <deck id="conversationDeck" flex="1">
+      <hbox id="conversationFacade" align="center" pack="center" flex="1">
+        <description value="&unibrow.conversation.facade.label;" crop="center"/>
+      </hbox>
+      <browser id="conversationFrame"
+               disablehistory="true"
+               src="chrome://instantbird/content/instantbird.xul"
+               type="chrome"
+               flex="1"/>
+    </deck>
   </hbox>
   <script src="chrome://unibrow/content/unibrow.js"
           type="application/x-javascript;version=1.8;e4x=1"/>
