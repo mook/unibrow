@@ -1,0 +1,13 @@
+@import url(chrome://instantbird/skin/tabbrowser.css);
+buddy {
+  -moz-binding: url(chrome://unibrow/content/bindings.xml#buddy);
+}
+buddy .tab-close-button {
+  display: none;
+}
+
+buddy[unibrow="true"] .tab-close-button {
+  display: -moz-box;
+  -moz-margin-end: 3px;
+  -moz-binding: url(chrome://unibrow/content/bindings.xml#closebutton);
+}
