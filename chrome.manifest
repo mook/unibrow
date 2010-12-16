@@ -4,9 +4,8 @@ locale unibrow en-US locale/en-US/
 
 resource unibrow jsmodules/
 
-# override chrome://instantbird/content/menus.js to open windows differently
 overlay chrome://instantbird/content/blist.xul chrome://unibrow/content/menu-overlay.xul
-#overlay chrome://instantbird/content/preferences/main.xul chrome://unibrow/content/prefs-overlay.xul
+style chrome://instantbird/content/blist.xul chrome://unibrow/skin/blist.css
 
-#style chrome://instantbird/content/instantbird.xul chrome://unibrow/skin/instantbird.css
+style chrome://instantbird/content/instantbird.xul chrome://unibrow/skin/instantbird.css
 

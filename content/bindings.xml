@@ -7,52 +7,81 @@
     xmlns:html="http://www.w3.org/1999/xhtml"
     xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <binding id="baseTab"
-           extends="chrome://global/content/bindings/richlistbox.xml#richlistitem">
-    <content>
-      <xul:label anonid="label" xbl:inherits="value=label"/>
+  <binding id="buddy"
+           extends="chrome://instantbird/content/buddy.xml#buddy">
+    <content align="center">
+      <xul:stack class="prplBuddyIcon">
+        <xul:image xbl:inherits="src=iconPrpl" class="protoIcon"/>
+        <xul:image class="statusIcon"/>
+      </xul:stack>
+      <xul:label crop="end" flex="1"
+                 anonid="displayname" class="buddyDisplayName"
+                 xbl:inherits="value=displayname"/>
+      <xul:toolbarbutton class="tab-close-button"/>
     </content>
     <implementation>
-      <property name="label">
-        <getter>
-          return this.getAttribute("label");
-        </getter>
-        <setter>
-          this.setAttribute("label", val);
-          return String(val);
-        </setter>
-      </property>
-    </implementation>
-  </binding>
-
-  <binding id="singletonTab"
-           extends="#baseTab">
-  </binding>
-
-  <binding id="conversationTab"
-           extends="#baseTab">
-    <implementation>
-      <property name="panelId">
-        <getter>
-          return this.getAttribute("linkedpanel");
-        </getter>
-      </property>
-      <property name="panel">
-        <getter>
-          try {
-          return Unibrow.conversations.contentDocument.getElementById(this.panelId);
-          } catch (e) {
-            Cu.reportError(e);
-            throw e;
+      <method name="build">
+        <parameter name="aContact"/>
+        <parameter name="aGroup"/>
+        <body>
+        <![CDATA[
+          const Cu = Components.utils;
+          var scope = {};
+          if (aGroup.tag == Services.Unibrow.Tag) {
+            this.setAttribute("unibrow", true);
           }
-        </getter>
-      </property>
-      <property name="tab">
-        <getter>
-          return this.panel.parentNode.getRelatedElement(this.panel);
-        </getter>
-      </property>
+
+          // remember to call the previous binding's .build() method
+          var proto = this;
+          while (proto[arguments.callee.name] != arguments.callee) {
+            // in case somebody else is riding on top of us
+            proto = proto.__proto__;
+          }
+          while (proto[arguments.callee.name] == arguments.callee) {
+            // and this finds the previous .build()
+            proto = proto.__proto__;
+          }
+          return proto[arguments.callee.name].apply(this, Array.slice(arguments));
+        ]]>
+        </body>
+      </method>
     </implementation>
+  </binding>
+
+  <binding id="closebutton"
+           extends="chrome://instantbird/content/tabbrowser.xml#tabbrowser-close-tab-button">
+    <handlers>
+      <handler event="click" button="0" phase="capturing"><![CDATA[
+
+        { /** copied from tabbrowser#tabbrowser-close-tab-button */
+          if (event.detail > 1 && !this._ignoredClick) {
+            return;
+          }
+        }
+        var contact = document.getBindingParent(this).contact;
+        var conversations = Services.Unibrow
+                                    .mainWindow
+                                    .conversations
+                                    .contentDocument
+                                    .getElementById("conversations");
+
+        for each (let conv in conversations.conversations) {
+          if (conv.conv == contact.conversation) {
+            conversations.removeTab(conv.tab);
+            break;
+          }
+        }
+
+        // trick the base binding into not trying to do anything by un-applying
+        // the parent binding
+        document.getBindingParent(this).removeAttribute("unibrow");
+        // force the styles to be re-calculated (therefore un-binding)
+        this.getBoundingClientRect();
+
+        event.stopPropagation();
+        event.preventDefault();
+      ]]></handler>
+    </handlers>
   </binding>
 
 </bindings>
