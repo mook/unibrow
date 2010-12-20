@@ -24,6 +24,7 @@
         windowtype="Unibrow"
         width="800" height="600" persist="left top width height"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <menubar id="blistMenubar"/>
   <hbox id="unibrowContainer" flex="1">
     <browser id="buddyFrame"
              type="chrome"
@@ -44,6 +45,13 @@
                flex="1"/>
     </deck>
   </hbox>
+  <script src="chrome://instantbird/content/utilities.js"
+          type="application/javascript"/>
   <script src="chrome://unibrow/content/unibrow.js"
-          type="application/x-javascript;version=1.8;e4x=1"/>
+          type="application/javascript;version=1.8;e4x=1"/>
+  
+  <!-- menu overlay points -->
+  <commandset id="maincommandset"/>
+  <keyset id="mainkeyset"/>
+  <popupset id="mainpopupset"/>
 </window>

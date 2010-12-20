@@ -1,4 +1,9 @@
 @import url(chrome://instantbird/skin/tabbrowser.css);
+
+#blistMenubar {
+  visibility: collapse;
+}
+
 buddy {
   -moz-binding: url(chrome://unibrow/content/bindings.xml#buddy);
 }
