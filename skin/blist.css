@@ -20,6 +20,6 @@ buddy[unibrow="true"] .tab-close-button {
 buddy[unibrow-newtext] {
   color: darkgreen;
 }
-buddy[unibrow-newtext="containsNick"] {
+buddy[unibrow-newtext="important"] {
   color: red;
 }

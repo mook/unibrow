@@ -57,9 +57,11 @@
                   // this conversation is visible anyway, don't highlight
                   this.removeAttribute("unibrow-newtext");
                 }
-                else if (aSubject.containsNick) {
+                else if (aSubject.containsNick ||
+                         !this.contact.conversation.isChat)
+                {
                   // this message is "important"
-                  this.setAttribute("unibrow-newtext", "containsNick");
+                  this.setAttribute("unibrow-newtext", "important");
                 }
                 else {
                   // this message isn't interesting
