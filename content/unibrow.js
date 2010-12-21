@@ -102,11 +102,13 @@ var Unibrow = {
                           .filter(function(c) c.conversation == conv)
                           .pop();
     var blistDoc = document.getElementById("buddyFrame").contentDocument;
-    var nodes = blistDoc.querySelectorAll("buddy[unibrow]");
+    var blist = blistDoc.getElementById("buddylistbox");
+    var nodes = blist.querySelectorAll("buddy[unibrow]");
     for (let i = 0; i < nodes.length; ++i) {
       let node = nodes.item(i);
       if (node.contact.conversation == conv) {
         node.removeAttribute("unibrow-newtext");
+        blist.selectItem(node);
         break;
       }
     }
