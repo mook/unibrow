@@ -96,13 +96,18 @@ var Unibrow = {
   },
 
   onTabSelect: function Unibrow_onTabSelect(aEvent) {
-    return;
     var tab = aEvent.originalTarget;
-    for (let i = 0; i < Unibrow.list.childNodes.length; ++i) {
-      let item = Unibrow.list.childNodes.item(i);
-      if (item.panelId == tab.linkedPanel) {
-        Unibrow.list.selectedItem = item;
-        return;
+    var conv = tab.linkedConversation.conv;
+    var contact = Services.Unibrow.Tag.getContacts()
+                          .filter(function(c) c.conversation == conv)
+                          .pop();
+    var blistDoc = document.getElementById("buddyFrame").contentDocument;
+    var nodes = blistDoc.querySelectorAll("buddy[unibrow]");
+    for (let i = 0; i < nodes.length; ++i) {
+      let node = nodes.item(i);
+      if (node.contact.conversation == conv) {
+        node.removeAttribute("unibrow-newtext");
+        break;
       }
     }
   },

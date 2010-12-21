@@ -19,7 +19,7 @@
                  xbl:inherits="value=displayname"/>
       <xul:toolbarbutton class="tab-close-button"/>
     </content>
-    <implementation>
+    <implementation implements="nsIObserver">
       <method name="build">
         <parameter name="aContact"/>
         <parameter name="aGroup"/>
@@ -29,19 +29,66 @@
           var scope = {};
           if (aGroup.tag == Services.Unibrow.Tag) {
             this.setAttribute("unibrow", true);
+            aContact.conversation.addObserver(this);
           }
 
           // remember to call the previous binding's .build() method
+          return this.callBaseBinding(arguments.callee, arguments);
+        ]]>
+        </body>
+      </method>
+      <method name="observe">
+        <parameter name="aSubject"/>
+        <parameter name="aTopic"/>
+        <parameter name="aData"/>
+        <body>
+        <![CDATA[
+          const Ci = Components.interfaces;
+          const Cu = Components.utils;
+          if (this.hasAttribute("unibrow")) {
+            switch (aTopic) {
+              case "new-text":
+                if (!(aSubject instanceof Ci.purpleIMessage)) {
+                  break;
+                }
+                this.setAttribute("unibrow-newtext", true);
+                if (aSubject.containsNick) {
+                  this.setAttribute("unibrow-newtext", "containsNick");
+                }
+                break;
+            }
+          }
+          return this.callBaseBinding(arguments.callee, arguments);
+        ]]>
+        </body>
+      </method>
+      <method name="openConversation">
+        <body>
+        <![CDATA[
+          if (this.hasAttribute("unibrow")) {
+            this.removeAttribute("unibrow-newtext");
+          }
+          return this.callBaseBinding(arguments.callee, arguments);
+        ]]>
+        </body>
+      </method>
+      <method name="callBaseBinding">
+        <parameter name="aMethod"/>
+        <parameter name="aArguments"/>
+        <body>
+        <![CDATA[
           var proto = this;
-          while (proto[arguments.callee.name] != arguments.callee) {
+          while (proto[aMethod.name] != aMethod) {
             // in case somebody else is riding on top of us
             proto = proto.__proto__;
           }
-          while (proto[arguments.callee.name] == arguments.callee) {
+          while (proto[aMethod.name] == aMethod) {
             // and this finds the previous .build()
             proto = proto.__proto__;
           }
-          return proto[arguments.callee.name].apply(this, Array.slice(arguments));
+          if (aMethod.name in proto) {
+            return proto[aMethod.name].apply(this, Array.slice(aArguments));
+          }
         ]]>
         </body>
       </method>

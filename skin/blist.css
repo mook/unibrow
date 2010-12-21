@@ -16,3 +16,10 @@ buddy[unibrow="true"] .tab-close-button {
   -moz-margin-end: 3px;
   -moz-binding: url(chrome://unibrow/content/bindings.xml#closebutton);
 }
+
+buddy[unibrow-newtext] {
+  color: darkgreen;
+}
+buddy[unibrow-newtext="containsNick"] {
+  color: red;
+}

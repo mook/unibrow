@@ -27,6 +27,9 @@ UnibrowContact.prototype = {
     this._conv.removeObserver(this);
     delete this._conv;
   },
+  toString: function UnibrowContact_toString() {
+    return "<UnibrowContact#" + String(this.displayName) + ">";
+  },
 
   /** imIContact */
   id: -1,
@@ -123,7 +126,6 @@ UnibrowContact.prototype = {
         this.notifyObservers(this, "contact-availability-changed", null);
         break;
       default:
-        Cu.reportError("fake contact observed " + aTopic);
     }
   },
 
