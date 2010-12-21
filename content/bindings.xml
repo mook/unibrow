@@ -51,9 +51,19 @@
                 if (!(aSubject instanceof Ci.purpleIMessage)) {
                   break;
                 }
-                this.setAttribute("unibrow-newtext", true);
-                if (aSubject.containsNick) {
+                let browser = Services.Unibrow.mainWindow.browser;
+                let selectedConv = browser.selectedConversation.conv;
+                if (selectedConv == this.contact.conversation) {
+                  // this conversation is visible anyway, don't highlight
+                  this.removeAttribute("unibrow-newtext");
+                }
+                else if (aSubject.containsNick) {
+                  // this message is "important"
                   this.setAttribute("unibrow-newtext", "containsNick");
+                }
+                else {
+                  // this message isn't interesting
+                  this.setAttribute("unibrow-newtext", true);
                 }
                 break;
             }
