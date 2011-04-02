@@ -11,7 +11,6 @@ var Unibrow = {
   __proto__: window,
   /* members */
   conversations: null, /** <browser src=instantbird.xul> */
-  browser: null,       /** <conversations> */
   deck: null,          /** <deck id="unibrowDeck"> */
   strings: null,       /** nsIStringBundle */
   
@@ -115,6 +114,8 @@ var Unibrow = {
   },
   
   /** getters that can't be lazy because things might change under them */
+
+  /* <conversations> */
   get browser() Unibrow.conversations.contentWindow.getBrowser(),
 };
 
